@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/as-service/as.service.iml" filepath="$PROJECT_DIR$/as-service/as.service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/eureka-server/eureka.server.iml" filepath="$PROJECT_DIR$/eureka-server/eureka.server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ext-service/ext.service.iml" filepath="$PROJECT_DIR$/ext-service/ext.service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/msjwt.iml" filepath="$PROJECT_DIR$/.idea/msjwt.iml" />
+    </modules>
+  </component>
+</project>

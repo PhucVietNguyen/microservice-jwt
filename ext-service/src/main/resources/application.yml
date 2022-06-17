@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: export-service
+  datasource:
+    url: jdbc:mariadb://localhost:3306/ext
+    tomcat:
+      connection-properties: useUnicode=true;characterEncoding=utf-8;
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: root
+    password: root
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+
+server:
+  port: 8002
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+secret-key:
+  app:
+    jwtSecret: cong@chiend@u!2#
