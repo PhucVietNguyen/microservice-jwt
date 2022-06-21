@@ -1,0 +1,67 @@
+version: "3"
+services:
+  maria-db:
+    image: mariadb
+    container_name: maria-db
+    ports:
+      - "3306:3306"
+    restart: always
+    networks:
+      - micro-service
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+  eureka-service:
+    container_name: eureka-service
+    image: eureka-service:latest
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    expose:
+      - 8761
+    networks:
+      - micro-service
+    ports:
+      - "8761:8761"
+    logging:
+      driver: json-file
+    restart: always
+  as-service:
+    container_name: as-service
+    image: as-service:latest
+    build:
+      context: ./as-service
+      dockerfile: Dockerfile
+    expose:
+      - 8001
+    networks:
+      - micro-service
+    ports:
+      - "8001:8001"
+    logging:
+      driver: json-file
+    restart: always
+    depends_on:
+      - maria-db
+      - eureka-service
+  ext-service:
+    container_name: ext-service
+    image: ext-service:latest
+    build:
+      context: ./ext-service
+      dockerfile: Dockerfile
+    expose:
+      - 8002
+    networks:
+      - micro-service
+    ports:
+      - "8002:8002"
+    logging:
+      driver: json-file
+    restart: always
+    depends_on:
+      - maria-db
+      - eureka-service
+networks:
+  micro-service:
+    external:
+      name: micro-service
