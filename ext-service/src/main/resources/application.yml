@@ -28,3 +28,16 @@ eureka:
 secret-key:
   app:
     jwtSecret: cong@chiend@u!2#
+
+dubbo:
+  application:
+    name: ext
+  registry:
+    address: zookeeper://localhost:2181?timeout=100000
+  scan:
+    base-packages: com.example.ext.service.dubbo
+  consumer:
+    check: false
+  protocol:
+    name: dubbo
+    port: -1

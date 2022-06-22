@@ -5,7 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/as-service/as.service.iml" filepath="$PROJECT_DIR$/as-service/as.service.iml" />
       <module fileurl="file://$PROJECT_DIR$/eureka-server/eureka.server.iml" filepath="$PROJECT_DIR$/eureka-server/eureka.server.iml" />
       <module fileurl="file://$PROJECT_DIR$/ext-service/ext.service.iml" filepath="$PROJECT_DIR$/ext-service/ext.service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ext-service-model/ext.service.model.iml" filepath="$PROJECT_DIR$/ext-service-model/ext.service.model.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/msjwt.iml" filepath="$PROJECT_DIR$/.idea/msjwt.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpt-service/rpt.service.iml" filepath="$PROJECT_DIR$/rpt-service/rpt.service.iml" />
     </modules>
   </component>
 </project>
