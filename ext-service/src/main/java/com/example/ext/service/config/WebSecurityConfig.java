@@ -22,6 +22,11 @@ public class WebSecurityConfig {
   }
 
   @Bean
+  public ExceptionHandlerFilter exceptionHandlerFilter() {
+    return new ExceptionHandlerFilter();
+  }
+
+  @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf()
         .disable()
@@ -48,6 +53,7 @@ public class WebSecurityConfig {
         // Any other request must be authenticated
         .anyRequest()
         .authenticated();
+    http.addFilterBefore(exceptionHandlerFilter(), AuthTokenFilter.class);
     return http.build();
   }
 }

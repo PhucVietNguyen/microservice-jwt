@@ -150,4 +150,6 @@ public class AuthController {
                 new TokenRefreshException(
                     requestRefreshToken, "Refresh token is not in database!"));
   }
+
+  // add logout and reset password and throw exception expired time
 }
