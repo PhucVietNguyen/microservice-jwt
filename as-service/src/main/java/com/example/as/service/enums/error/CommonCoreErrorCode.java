@@ -1,4 +1,4 @@
-package com.example.ext.service.enums.error;
+package com.example.as.service.enums.error;
 
 public enum CommonCoreErrorCode implements ErrorCode {
   CLIENT_GROUP_ERROR("1", "Client group is incorrect"),

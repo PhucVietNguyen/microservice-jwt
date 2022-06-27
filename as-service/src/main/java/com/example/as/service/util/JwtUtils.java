@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -52,6 +54,25 @@ public class JwtUtils {
 
   public String getUserNameFromJwtToken(String token) {
     return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+  }
+
+  public Date getExpirationDateFromToken(String token) {
+    return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getExpiration();
+  }
+
+  //  return token remaining time in ms
+  public Long getTokenRemainingTime(String token) {
+    Date date = new Date();
+    return getExpirationDateFromToken(token).getTime() - date.getTime();
+  }
+
+  public String parseJwt(HttpServletRequest request) {
+    final String headerAuth = request.getHeader("Authorization");
+
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+      return headerAuth.substring(7);
+    }
+    return null;
   }
 
   public boolean validateJwtToken(String authToken) {

@@ -15,6 +15,10 @@ spring:
       properties:
         hibernate:
           format_sql: true
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 3000ms
 
 server:
   port: 8001
@@ -26,7 +30,7 @@ logging:
 secret-key:
   app:
     jwtSecret: cong@chiend@u!2#
-    jwtExpirationMs: 60000
+    jwtExpirationMs: 240000
     jwtRefreshExpirationMs: 1200000
 
 eureka:

@@ -1,4 +1,4 @@
-package com.example.ext.service.enums.error;
+package com.example.as.service.enums.error;
 
 public interface ErrorCode {
   String getCode();

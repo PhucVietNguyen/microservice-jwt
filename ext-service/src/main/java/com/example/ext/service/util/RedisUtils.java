@@ -4,6 +4,7 @@ import com.example.ext.service.enums.error.CommonCoreErrorCode;
 import com.example.ext.service.enums.redis.RedisConstant;
 import com.example.ext.service.exception.BusinessException;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 @Log4j2
 public class RedisUtils {
 
+  @Autowired
   private RedisTemplate<String, Object> redisTemplate;
 
   public boolean isTokenBlacklisted(String token) {

@@ -27,4 +27,7 @@ public class RefreshTokenEntity extends BaseEntity {
 
   @Column(nullable = false)
   private Instant expiryDate;
+
+  @Column(nullable = false)
+  private String accessToken;
 }

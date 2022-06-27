@@ -1,12 +1,15 @@
 package com.example.as.service.controller;
 
+import com.example.as.service.exception.BusinessException;
 import com.example.as.service.exception.TokenRefreshException;
+import com.example.as.service.exception.ValidUserOrPasswordException;
 import com.example.as.service.model.entity.RefreshTokenEntity;
 import com.example.as.service.model.entity.RoleEntity;
 import com.example.as.service.model.entity.UserEntity;
 import com.example.as.service.model.entity.security.UserDetailsImpl;
 import com.example.as.service.model.enums.ERole;
 import com.example.as.service.model.request.LoginRequest;
+import com.example.as.service.model.request.LogoutRequest;
 import com.example.as.service.model.request.SignupRequest;
 import com.example.as.service.model.request.TokenRefreshRequest;
 import com.example.as.service.model.response.JwtRefreshResponse;
@@ -16,15 +19,18 @@ import com.example.as.service.repository.RoleRepository;
 import com.example.as.service.repository.UserRepository;
 import com.example.as.service.service.RefreshTokenService;
 import com.example.as.service.util.JwtUtils;
+import com.example.as.service.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
@@ -48,13 +54,23 @@ public class AuthController {
 
   @Autowired private RefreshTokenService refreshTokenService;
 
+  @Autowired private RedisUtils redisUtils;
+
   @PostMapping("/sign-in")
-  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-    Authentication authentication =
-        authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(), loginRequest.getPassword()));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
+  public ResponseEntity<?> signIn(@Valid @RequestBody LoginRequest loginRequest) {
+    Authentication authentication = null;
+    try {
+      authentication =
+          authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(
+                  loginRequest.getUsername(), loginRequest.getPassword()));
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+    } catch (AuthenticationException ex) {
+      throw ValidUserOrPasswordException.builder()
+          .errCode("1401")
+          .errMessage("username or password is invalid")
+          .build();
+    }
     String jwt = jwtUtils.generateJwtToken(authentication);
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -62,7 +78,8 @@ public class AuthController {
         userDetails.getAuthorities().stream()
             .map(item -> item.getAuthority())
             .collect(Collectors.toList());
-    RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+    RefreshTokenEntity refreshToken =
+        refreshTokenService.createRefreshToken(userDetails.getId(), jwt);
     return ResponseEntity.ok(
         JwtResponse.builder()
             .token(jwt)
@@ -135,21 +152,29 @@ public class AuthController {
   @PostMapping("/refresh-token")
   public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
     String requestRefreshToken = request.getRefreshToken();
-    return refreshTokenService
-        .findByToken(requestRefreshToken)
-        .map(refreshTokenService::verifyExpiration)
-        .map(RefreshTokenEntity::getUser)
-        .map(
-            user -> {
-              String token = jwtUtils.generateTokenFromUsername(user);
-              return ResponseEntity.ok(
-                  new JwtRefreshResponse(token, requestRefreshToken, "Bearer"));
-            })
-        .orElseThrow(
-            () ->
-                new TokenRefreshException(
-                    requestRefreshToken, "Refresh token is not in database!"));
+    RefreshTokenEntity refreshToken =
+        refreshTokenService
+            .findByToken(requestRefreshToken)
+            .map(redisUtils::blacklistJwt)
+            .orElseThrow(
+                () ->
+                    new TokenRefreshException(
+                        requestRefreshToken, "Refresh token is not in database!"));
+    refreshTokenService.verifyExpiration(refreshToken);
+    String token = jwtUtils.generateTokenFromUsername(refreshToken.getUser());
+    refreshToken.setAccessToken(token);
+    refreshTokenService.updateRefreshToken(refreshToken);
+    return ResponseEntity.ok(new JwtRefreshResponse(token, requestRefreshToken, "Bearer"));
   }
 
-  // add logout and reset password and throw exception expired time
+  @PostMapping("/sign-out")
+  public ResponseEntity<?> signOut(@Valid @RequestBody LogoutRequest request, HttpServletRequest servletRequest) {
+    String token = jwtUtils.parseJwt(servletRequest);
+    if (token == null) {
+      throw new BusinessException("1400", "token is invalid");
+    }
+    request.setToken(token);
+//    authenticationService.logout(logoutRequest);
+    return ResponseEntity.ok("User successfully logout");
+  }
 }
