@@ -38,7 +38,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     if (jwt == null || !isJwtValid) {
       throw new InvalidAccessTokenException(jwt);
     }
-    if (redisUtils.isTokenBlacklisted(jwt)) { // throw JWT Token is Expired exception
+    if (redisUtils.isTokenBlacklisted(jwt)) {
       throw new AccessTokenExpireException(jwt);
     }
 
@@ -48,10 +48,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
       List<String> authorities = jwtUtils.getAuthoritiesFromJwtToken(jwt);
 
       // 5. Create auth object
-      // UsernamePasswordAuthenticationToken: A built-in object, used by spring to represent the
-      // current authenticated / being authenticated user. // It needs a list of authorities,
-      // which has type of GrantedAuthority interface, where SimpleGrantedAuthority is an
-      // implementation of that interface
       UsernamePasswordAuthenticationToken authentication =
           new UsernamePasswordAuthenticationToken(
               username,
@@ -59,11 +55,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
               authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
 
       // 6. Authenticate the user
-      // Now, user is authenticated  SecurityContextHolder.getContext().setAuthentication(auth);
       authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
-
     filterChain.doFilter(request, response);
   }
 

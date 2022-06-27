@@ -12,7 +12,6 @@ import com.example.ext.service.model.request.StudentRequest;
 import com.example.ext.service.repository.RoomRepository;
 import com.example.ext.service.repository.StudentRepository;
 import com.example.ext.service.service.RoomService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,63 +24,62 @@ import java.util.Optional;
 @Log4j2
 public class RoomServiceImpl implements RoomService {
 
-    @Autowired
-    private RoomRepository roomRepository;
+  @Autowired private RoomRepository roomRepository;
 
-    @Autowired
-    private StudentRepository studentRepository;
+  @Autowired private StudentRepository studentRepository;
 
-    private RoomMapper roomMapper = RoomMapper.INSTANCE;
+  private RoomMapper roomMapper = RoomMapper.INSTANCE;
 
-    private StudentMapper studentMapper = StudentMapper.INSTANCE;
+  private StudentMapper studentMapper = StudentMapper.INSTANCE;
 
-    @Override
-    @Transactional
-    public int createRoom(RoomRequest request) {
-        if (request == null) {
-            throw new BusinessException("1111", "Data is not null");
-        }
-        RoomEntity room = roomMapper.dtoToEntity(request);
-        RoomEntity room1 = roomRepository.save(room);
-        if (request.getStudents() != null && !request.getStudents().isEmpty()) {
-            List<StudentEntity> students = studentMapper.listDtoToEntity(request.getStudents());
-            students.forEach(student -> {
-                student.setRoom(room1);
-            });
-            studentRepository.saveAll(students);
-        }
-        return 1;
+  @Override
+  @Transactional
+  public int createRoom(RoomRequest request) {
+    if (request == null) {
+      throw new BusinessException("1111", "Data is not null");
     }
-
-    @Override
-    public RoomRequest findRoomById(Long id) {
-        if (id == null) {
-            throw new BusinessException("1112", "Id is not null");
-        }
-        Optional<RoomEntity> roomOpt = roomRepository.findById(id);
-        if (roomOpt == null || roomOpt.isEmpty()) {
-            throw new BusinessException("1113", "Entity is not exist");
-        }
-        RoomRequest request = roomMapper.entityToDto(roomOpt.get());
-        List<StudentEntity> entities = studentRepository.findAllByRoomId(id);
-        List<StudentRequest> requestList = studentMapper.listEntityToDto(entities);
-        request.setStudents(requestList);
-        return request;
+    RoomEntity room = roomMapper.dtoToEntity(request);
+    RoomEntity room1 = roomRepository.save(room);
+    if (request.getStudents() != null && !request.getStudents().isEmpty()) {
+      List<StudentEntity> students = studentMapper.listDtoToEntity(request.getStudents());
+      students.forEach(
+          student -> {
+            student.setRoom(room1);
+          });
+      studentRepository.saveAll(students);
     }
+    return 1;
+  }
 
-    @Override
-    public RoomDto getRoomDtoById(Long id) {
-        if (id == null) {
-            throw new BusinessException("1112", "Id is not null");
-        }
-        Optional<RoomEntity> roomOpt = roomRepository.findById(id);
-        if (roomOpt == null || roomOpt.isEmpty()) {
-            throw new BusinessException("1113", "Entity is not exist");
-        }
-        RoomDto dto = roomMapper.entityToDto1(roomOpt.get());
-        List<StudentEntity> entities = studentRepository.findAllByRoomId(id);
-        List<StudentDto> requestDto = studentMapper.listEntityToDto1(entities);
-        dto.setStudents(requestDto);
-        return dto;
+  @Override
+  public RoomRequest findRoomById(Long id) {
+    if (id == null) {
+      throw new BusinessException("1112", "Id is not null");
     }
+    Optional<RoomEntity> roomOpt = roomRepository.findById(id);
+    if (roomOpt == null || roomOpt.isEmpty()) {
+      throw new BusinessException("1113", "Entity is not exist");
+    }
+    RoomRequest request = roomMapper.entityToDto(roomOpt.get());
+    List<StudentEntity> entities = studentRepository.findAllByRoomId(id);
+    List<StudentRequest> requestList = studentMapper.listEntityToDto(entities);
+    request.setStudents(requestList);
+    return request;
+  }
+
+  @Override
+  public RoomDto getRoomDtoById(Long id) {
+    if (id == null) {
+      throw new BusinessException("1112", "Id is not null");
+    }
+    Optional<RoomEntity> roomOpt = roomRepository.findById(id);
+    if (roomOpt == null || roomOpt.isEmpty()) {
+      throw new BusinessException("1113", "Entity is not exist");
+    }
+    RoomDto dto = roomMapper.entityToDto1(roomOpt.get());
+    List<StudentEntity> entities = studentRepository.findAllByRoomId(id);
+    List<StudentDto> requestDto = studentMapper.listEntityToDto1(entities);
+    dto.setStudents(requestDto);
+    return dto;
+  }
 }

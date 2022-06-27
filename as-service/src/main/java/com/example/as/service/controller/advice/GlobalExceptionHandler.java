@@ -21,7 +21,11 @@ public class GlobalExceptionHandler {
     log.warn("Business logic exception: {}, stack trace:", e.getMessage());
     e.printStackTrace();
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(ErrorResponse.builder().errorCode(e.getErrorCode()).errorMessage(e.getErrorMsg()).build());
+        .body(
+            ErrorResponse.builder()
+                .errorCode(e.getErrorCode())
+                .errorMessage(e.getErrorMsg())
+                .build());
   }
 
   @ExceptionHandler({Exception.class})

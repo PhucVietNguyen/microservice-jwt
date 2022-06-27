@@ -168,13 +168,14 @@ public class AuthController {
   }
 
   @PostMapping("/sign-out")
-  public ResponseEntity<?> signOut(@Valid @RequestBody LogoutRequest request, HttpServletRequest servletRequest) {
+  public ResponseEntity<?> signOut(
+      @Valid @RequestBody LogoutRequest request, HttpServletRequest servletRequest) {
     String token = jwtUtils.parseJwt(servletRequest);
     if (token == null) {
       throw new BusinessException("1400", "token is invalid");
     }
     request.setToken(token);
-//    authenticationService.logout(logoutRequest);
+    //    authenticationService.logout(logoutRequest);//Todo save auth_history... table
     return ResponseEntity.ok("User successfully logout");
   }
 }
