@@ -1,7 +1,7 @@
 package com.example.ext.service.config;
 
-import com.example.ext.service.exception.AccessTokenExpireException;
-import com.example.ext.service.exception.InvalidAccessTokenException;
+import com.example.common.core.exception.AccessTokenExpireException;
+import com.example.common.core.exception.InvalidAccessTokenException;
 import com.example.ext.service.util.JwtUtils;
 import com.example.ext.service.util.RedisUtils;
 import lombok.extern.log4j.Log4j2;

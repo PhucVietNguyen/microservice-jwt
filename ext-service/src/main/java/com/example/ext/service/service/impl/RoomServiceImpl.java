@@ -1,6 +1,7 @@
 package com.example.ext.service.service.impl;
 
-import com.example.ext.service.exception.BusinessException;
+import com.example.common.core.exception.BusinessException;
+import com.example.ext.service.exception.ExtErrorCode;
 import com.example.ext.service.mapper.RoomMapper;
 import com.example.ext.service.mapper.StudentMapper;
 import com.example.ext.service.model.dto.RoomDto;
@@ -36,7 +37,9 @@ public class RoomServiceImpl implements RoomService {
   @Transactional
   public int createRoom(RoomRequest request) {
     if (request == null) {
-      throw new BusinessException("1111", "Data is not null");
+      throw new BusinessException(
+          ExtErrorCode.INVALID_REQUEST_CREATE_ROOM.getServiceErrorCode(),
+          ExtErrorCode.INVALID_REQUEST_CREATE_ROOM.getDesc());
     }
     RoomEntity room = roomMapper.dtoToEntity(request);
     RoomEntity room1 = roomRepository.save(room);

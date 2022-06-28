@@ -1,11 +1,10 @@
 package com.example.as.service.service.impl;
 
-import com.example.as.service.exception.BusinessException;
-import com.example.as.service.exception.TokenRefreshException;
 import com.example.as.service.model.entity.RefreshTokenEntity;
 import com.example.as.service.repository.RefreshTokenRepository;
 import com.example.as.service.repository.UserRepository;
 import com.example.as.service.service.RefreshTokenService;
+import com.example.common.core.exception.TokenRefreshException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

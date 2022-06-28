@@ -1,8 +1,8 @@
 package com.example.ext.service.config;
 
-import com.example.ext.service.enums.error.CommonCoreErrorCode;
-import com.example.ext.service.exception.AccessTokenExpireException;
-import com.example.ext.service.exception.InvalidAccessTokenException;
+import com.example.common.core.enums.exception.CommonCoreErrorCode;
+import com.example.common.core.exception.AccessTokenExpireException;
+import com.example.common.core.exception.InvalidAccessTokenException;
 import com.example.ext.service.model.response.ErrorResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

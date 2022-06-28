@@ -1,5 +1,6 @@
 package com.example.as.service.model.entity;
 
+import com.example.common.core.entities.AbstractAuditingEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserAuthenticationHistoryEntity extends BaseEntity implements Serializable {
+public class UserAuthenticationHistoryEntity extends AbstractAuditingEntity<Long> implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

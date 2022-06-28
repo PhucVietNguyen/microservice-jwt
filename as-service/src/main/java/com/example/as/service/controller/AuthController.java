@@ -1,8 +1,5 @@
 package com.example.as.service.controller;
 
-import com.example.as.service.exception.BusinessException;
-import com.example.as.service.exception.TokenRefreshException;
-import com.example.as.service.exception.ValidUserOrPasswordException;
 import com.example.as.service.model.entity.RefreshTokenEntity;
 import com.example.as.service.model.entity.RoleEntity;
 import com.example.as.service.model.entity.UserEntity;
@@ -20,6 +17,10 @@ import com.example.as.service.repository.UserRepository;
 import com.example.as.service.service.RefreshTokenService;
 import com.example.as.service.util.JwtUtils;
 import com.example.as.service.util.RedisUtils;
+import com.example.common.core.enums.exception.CommonCoreErrorCode;
+import com.example.common.core.exception.BusinessException;
+import com.example.common.core.exception.TokenRefreshException;
+import com.example.common.core.exception.ValidUserOrPasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -67,8 +69,8 @@ public class AuthController {
       SecurityContextHolder.getContext().setAuthentication(authentication);
     } catch (AuthenticationException ex) {
       throw ValidUserOrPasswordException.builder()
-          .errCode("1401")
-          .errMessage("username or password is invalid")
+          .errCode(CommonCoreErrorCode.USERNAME_PASSWORD_INVALID.getServiceErrorCode())
+          .errMessage(CommonCoreErrorCode.USERNAME_PASSWORD_INVALID.getDesc())
           .build();
     }
     String jwt = jwtUtils.generateJwtToken(authentication);
@@ -152,14 +154,13 @@ public class AuthController {
   @PostMapping("/refresh-token")
   public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
     String requestRefreshToken = request.getRefreshToken();
-    RefreshTokenEntity refreshToken =
-        refreshTokenService
-            .findByToken(requestRefreshToken)
-            .map(redisUtils::blacklistJwt)
-            .orElseThrow(
-                () ->
-                    new TokenRefreshException(
-                        requestRefreshToken, "Refresh token is not in database!"));
+    Optional<RefreshTokenEntity> refreshTokenOpt =
+        refreshTokenService.findByToken(requestRefreshToken);
+    if (!refreshTokenOpt.isPresent()) {
+      throw new TokenRefreshException(requestRefreshToken, "Refresh token is not exist");
+    }
+    RefreshTokenEntity refreshToken = refreshTokenOpt.get();
+    redisUtils.blacklistJwt(refreshToken);
     refreshTokenService.verifyExpiration(refreshToken);
     String token = jwtUtils.generateTokenFromUsername(refreshToken.getUser());
     refreshToken.setAccessToken(token);
@@ -172,7 +173,9 @@ public class AuthController {
       @Valid @RequestBody LogoutRequest request, HttpServletRequest servletRequest) {
     String token = jwtUtils.parseJwt(servletRequest);
     if (token == null) {
-      throw new BusinessException("1400", "token is invalid");
+      throw new BusinessException(
+          CommonCoreErrorCode.INVALID_TOKEN.getServiceErrorCode(),
+          CommonCoreErrorCode.INVALID_TOKEN.getDesc());
     }
     request.setToken(token);
     //    authenticationService.logout(logoutRequest);//Todo save auth_history... table

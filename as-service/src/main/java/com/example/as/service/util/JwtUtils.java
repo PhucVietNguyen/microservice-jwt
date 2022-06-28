@@ -25,12 +25,14 @@ public class JwtUtils {
   @Value("${secret-key.app.jwtExpirationMs}")
   private int jwtExpirationMs;
 
+  private static final String AUTHORITIES_KEY = "authorities";
+
   public String generateJwtToken(Authentication authentication) {
     UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
     return Jwts.builder()
         .setSubject((userPrincipal.getUsername()))
         .claim(
-            "authorities",
+            AUTHORITIES_KEY,
             userPrincipal.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()))
@@ -44,7 +46,7 @@ public class JwtUtils {
     return Jwts.builder()
         .setSubject(user.getUsername())
         .claim(
-            "authorities",
+            AUTHORITIES_KEY,
             user.getRoles().stream().map(RoleEntity::getName).collect(Collectors.toList()))
         .setIssuedAt(new Date())
         .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
