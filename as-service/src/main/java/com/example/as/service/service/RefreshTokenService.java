@@ -15,4 +15,6 @@ public interface RefreshTokenService {
   int deleteByUserId(Long userId);
 
   RefreshTokenEntity updateRefreshToken(RefreshTokenEntity token);
+
+  int revokeRefreshTokenByUserId(String username);
 }

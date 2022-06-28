@@ -62,4 +62,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
   public RefreshTokenEntity updateRefreshToken(RefreshTokenEntity token) {
     return refreshTokenRepository.save(token);
   }
+
+  @Override
+  public int revokeRefreshTokenByUserId(String username) {
+    return refreshTokenRepository.deleteByUserName(username);
+  }
 }

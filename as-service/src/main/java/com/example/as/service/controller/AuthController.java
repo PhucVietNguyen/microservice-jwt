@@ -15,6 +15,7 @@ import com.example.as.service.model.response.MessageResponse;
 import com.example.as.service.repository.RoleRepository;
 import com.example.as.service.repository.UserRepository;
 import com.example.as.service.service.RefreshTokenService;
+import com.example.as.service.service.UserAuthenticationHistoryService;
 import com.example.as.service.util.JwtUtils;
 import com.example.as.service.util.RedisUtils;
 import com.example.common.core.enums.exception.CommonCoreErrorCode;
@@ -58,6 +59,8 @@ public class AuthController {
 
   @Autowired private RedisUtils redisUtils;
 
+  @Autowired private UserAuthenticationHistoryService userAuthenticationHistoryService;
+
   @PostMapping("/sign-in")
   public ResponseEntity<?> signIn(@Valid @RequestBody LoginRequest loginRequest) {
     Authentication authentication = null;
@@ -82,6 +85,8 @@ public class AuthController {
             .collect(Collectors.toList());
     RefreshTokenEntity refreshToken =
         refreshTokenService.createRefreshToken(userDetails.getId(), jwt);
+    userAuthenticationHistoryService.saveAuthenticationHistory(
+        null, loginRequest, true, userDetails.getUsername());
     return ResponseEntity.ok(
         JwtResponse.builder()
             .token(jwt)
@@ -170,15 +175,26 @@ public class AuthController {
 
   @PostMapping("/sign-out")
   public ResponseEntity<?> signOut(
-      @Valid @RequestBody LogoutRequest request, HttpServletRequest servletRequest) {
+      @Valid @RequestBody LogoutRequest logoutRequest, HttpServletRequest servletRequest) {
     String token = jwtUtils.parseJwt(servletRequest);
     if (token == null) {
       throw new BusinessException(
           CommonCoreErrorCode.INVALID_TOKEN.getServiceErrorCode(),
           CommonCoreErrorCode.INVALID_TOKEN.getDesc());
     }
-    request.setToken(token);
-    //    authenticationService.logout(logoutRequest);//Todo save auth_history... table
+    logoutRequest.setToken(token);
+    String username = jwtUtils.getUserNameFromJwtToken(token);
+
+    if (refreshTokenService.revokeRefreshTokenByUserId(username) == 0) {
+      throw BusinessException.builder()
+          .errorCode(CommonCoreErrorCode.TOKEN_EXPIRED.getServiceErrorCode())
+          .errorMsg(CommonCoreErrorCode.TOKEN_EXPIRED.getDesc())
+          .build();
+    }
+    userAuthenticationHistoryService.saveAuthenticationHistory(
+        logoutRequest, null, false, username);
+
+    redisUtils.blacklistJwt(token, username);
     return ResponseEntity.ok("User successfully logout");
   }
 }

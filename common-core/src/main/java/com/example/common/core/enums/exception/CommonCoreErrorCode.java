@@ -15,8 +15,8 @@ public enum CommonCoreErrorCode implements ErrorCode {
   CONTROLLER_ILLEGAL_ARGUMENT("12", "The required argument cannot be parsed in controller"),
   VALIDATION_ERROR("13", "Validation failed"),
   RPC_EXCEPTION("14", "Rpc exception"),
-  USERNAME_PASSWORD_INVALID("15", "username or password is invalid"),
-  INVALID_REQUEST_CREATE_ROOM("15", "username or password is invalid");
+  USERNAME_PASSWORD_INVALID("15", "username or password is invalid")
+  ;
 
   private String code;
   private String desc;

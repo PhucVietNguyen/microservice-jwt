@@ -1,5 +1,6 @@
 package com.example.as.service.model.entity;
 
+import com.example.as.service.model.enums.EUserAction;
 import com.example.common.core.entities.AbstractAuditingEntity;
 import lombok.*;
 
@@ -14,35 +15,30 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserAuthenticationHistoryEntity extends AbstractAuditingEntity<Long> implements Serializable {
+public class UserAuthenticationHistoryEntity extends AbstractAuditingEntity<Long>
+    implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column
-    private String loginType; //email, phone...
+  @Column private String loginType; // email, phone...
 
-    @Column
-    private String deviceId;
+  @Column private String deviceId;
 
-    @Column
-    private String deviceType;
+  @Column private String deviceType;
 
-    @Column
-    private Instant actionDatetime;
+  @Column private Instant actionDatetime;
 
-    @Column
-    private String ipAddress;
+  @Column private String ipAddress;
 
-    @Column
-    private boolean isSuccess;
+  @Column private boolean isSuccess;
 
-    @Column
-//    @Enumerated(EnumType.STRING)
-    private String userAction; //login, logout
+  @Column
+  @Enumerated(EnumType.STRING)
+  private EUserAction userAction;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private UserEntity user;
 }

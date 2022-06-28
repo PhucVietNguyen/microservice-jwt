@@ -39,4 +39,13 @@ public class RedisUtils {
             refreshToken.getUser().getUsername());
     return refreshToken;
   }
+
+  public void blacklistJwt(String token, String username) {
+    if (token == null || isTokenBlacklisted(token)) {
+      throw new BusinessException(
+          CommonCoreErrorCode.INVALID_TOKEN.getServiceErrorCode(),
+          CommonCoreErrorCode.INVALID_TOKEN.getDesc());
+    }
+    redisTemplate.opsForValue().set(RedisConstant.JWT + token, username);
+  }
 }

@@ -1,15 +1,16 @@
-package com.example.ext.service.exception;
+package com.example.as.service.enums.error;
 
 import com.example.common.core.enums.exception.ErrorCode;
 
-public enum ExtErrorCode implements ErrorCode {
-    INVALID_REQUEST_CREATE_ROOM("1", "request is not null")
+public enum AsErrorCode implements ErrorCode {
+
+    USER_IS_NOT_EXIST("1", "user is not exist")
     ;
 
     private String code;
     private String desc;
 
-    private ExtErrorCode(String code, String desc) {
+    private AsErrorCode(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }

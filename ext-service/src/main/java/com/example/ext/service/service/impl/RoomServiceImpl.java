@@ -1,7 +1,7 @@
 package com.example.ext.service.service.impl;
 
 import com.example.common.core.exception.BusinessException;
-import com.example.ext.service.exception.ExtErrorCode;
+import com.example.ext.service.enums.error.ExtErrorCode;
 import com.example.ext.service.mapper.RoomMapper;
 import com.example.ext.service.mapper.StudentMapper;
 import com.example.ext.service.model.dto.RoomDto;
