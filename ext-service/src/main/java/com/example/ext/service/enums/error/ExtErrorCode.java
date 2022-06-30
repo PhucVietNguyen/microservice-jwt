@@ -3,7 +3,9 @@ package com.example.ext.service.enums.error;
 import com.example.common.core.enums.exception.ErrorCode;
 
 public enum ExtErrorCode implements ErrorCode {
-    INVALID_REQUEST_CREATE_ROOM("1", "request is not null")
+    INVALID_REQUEST_CREATE_ROOM("1", "request is not null"),
+    INVALID_REQUEST_GET_ROOM_ID("2", "id is not null"),
+    ROOM_IS_NOT_EXIST("3", "Entity is not exist"),
     ;
 
     private String code;

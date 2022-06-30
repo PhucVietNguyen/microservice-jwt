@@ -15,7 +15,6 @@ spring:
       properties:
         hibernate:
           format_sql: true
-
 server:
   port: 8003
 
@@ -41,3 +40,13 @@ dubbo:
   protocol:
     name: dubbo
     port: -1
+
+kafka-ext:
+  bootstrap-servers: localhost:29092
+  zookeeper-hosts: localhost:2181
+  topic-properties:
+    name: ext_test
+  thread-properties:
+    num-of-consumer: 2
+  consumer-properties:
+    group-id: ext

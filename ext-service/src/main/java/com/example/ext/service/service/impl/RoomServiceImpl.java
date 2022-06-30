@@ -57,11 +57,15 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public RoomRequest findRoomById(Long id) {
     if (id == null) {
-      throw new BusinessException("1112", "Id is not null");
+      throw new BusinessException(
+          ExtErrorCode.INVALID_REQUEST_GET_ROOM_ID.getServiceErrorCode(),
+          ExtErrorCode.INVALID_REQUEST_GET_ROOM_ID.getDesc());
     }
     Optional<RoomEntity> roomOpt = roomRepository.findById(id);
     if (roomOpt == null || roomOpt.isEmpty()) {
-      throw new BusinessException("1113", "Entity is not exist");
+      throw new BusinessException(
+          ExtErrorCode.ROOM_IS_NOT_EXIST.getServiceErrorCode(),
+          ExtErrorCode.ROOM_IS_NOT_EXIST.getDesc());
     }
     RoomRequest request = roomMapper.entityToDto(roomOpt.get());
     List<StudentEntity> entities = studentRepository.findAllByRoomId(id);
@@ -73,11 +77,15 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public RoomDto getRoomDtoById(Long id) {
     if (id == null) {
-      throw new BusinessException("1112", "Id is not null");
+      throw new BusinessException(
+          ExtErrorCode.INVALID_REQUEST_GET_ROOM_ID.getServiceErrorCode(),
+          ExtErrorCode.INVALID_REQUEST_GET_ROOM_ID.getDesc());
     }
     Optional<RoomEntity> roomOpt = roomRepository.findById(id);
     if (roomOpt == null || roomOpt.isEmpty()) {
-      throw new BusinessException("1113", "Entity is not exist");
+      throw new BusinessException(
+          ExtErrorCode.ROOM_IS_NOT_EXIST.getServiceErrorCode(),
+          ExtErrorCode.ROOM_IS_NOT_EXIST.getDesc());
     }
     RoomDto dto = roomMapper.entityToDto1(roomOpt.get());
     List<StudentEntity> entities = studentRepository.findAllByRoomId(id);
