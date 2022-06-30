@@ -52,7 +52,7 @@ public abstract class BaseKafkaConsumer<K, T> implements Runnable {
                   "--->prepare to handle message to end while loop, buffer size: "
                       + partitionRecords.size());
               handleMessage(partitionRecords, partition);
-              log.info("--->end handle message to end while loop");
+              log.info("--->end handle message to end while loop with threadId = " + Thread.currentThread().getId());
             }
           }
           consumer.commitAsync();

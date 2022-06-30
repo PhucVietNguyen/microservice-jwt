@@ -62,5 +62,5 @@ dubbo:
 
 cron-job:
   size: 5
-  rate: 5000
+  rate: 10000
   topic: ext_test

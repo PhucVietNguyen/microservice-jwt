@@ -8,16 +8,18 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Log4j2
 @RequiredArgsConstructor
 public class ThreadConsumerGroup {
 
-  private List<ProcessMessageKafkaFromExt> consumers;
+  private ProcessMessageKafkaFromExt consumer;
 
   private Properties consumerExtConfigs;
 
@@ -25,26 +27,48 @@ public class ThreadConsumerGroup {
 
   private final ApplicationContext applicationContext;
 
+  private ExecutorService executor;
+
   @PostConstruct
   public void AddThreadConsumerGroup() {
     consumerExtConfigs = applicationContext.getBean("consumerExtConfigs", Properties.class);
-    consumers = new ArrayList<>();
-    for (int i = 0; i < this.getNumberOfConsumers(); i++) {
-      ProcessMessageKafkaFromExt ncThread = new ProcessMessageKafkaFromExt();
-      ncThread.createKafkaConfig(
-          consumerExtConfigs, extKafkaProperties.getTopicProperties().getName());
-      consumers.add(ncThread);
-    }
+    consumer = new ProcessMessageKafkaFromExt();
+    consumer.createKafkaConfig(
+        consumerExtConfigs, extKafkaProperties.getTopicProperties().getName());
   }
 
   public void execute() {
-    for (ProcessMessageKafkaFromExt ncThread : consumers) {
-      Thread t = new Thread(ncThread);
-      t.start();
+    executor =
+        new ThreadPoolExecutor(
+            this.getNumberOfConsumers(),
+            this.getNumberOfConsumers() * 2,
+            0L,
+            TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<Runnable>(1000),
+            new ThreadPoolExecutor.CallerRunsPolicy());
+    while (true) {
+      executor.execute(consumer);
     }
   }
 
   public int getNumberOfConsumers() {
     return this.extKafkaProperties.getThreadProperties().getNumOfConsumer();
+  }
+
+  public void shutdown() throws InterruptedException {
+    if (consumer != null) {
+      consumer.shutdown();
+    }
+    if (executor != null) {
+      executor.shutdown();
+    }
+    try {
+      if (!executor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
+        System.out.println(
+            "Timed out waiting for consumer threads to shut down, exiting uncleanly");
+      }
+    } catch (InterruptedException e) {
+      System.out.println("Interrupted during shutdown, exiting uncleanly");
+    }
   }
 }

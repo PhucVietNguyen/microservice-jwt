@@ -20,5 +20,10 @@ public class ThreadPoolKafkaService {
   @PostConstruct
   public void createThreadPool() {
     threadConsumerGroup.execute();
+    try {
+      Thread.sleep(1000);
+      threadConsumerGroup.shutdown();
+    } catch (InterruptedException ie) {
+    }
   }
 }
