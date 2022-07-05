@@ -17,6 +17,8 @@ public class UnitJobImpl implements UnitJob {
 
   @Override
   public void pushDataToKafkaTopic(RoomDto roomDto) {
-    kafkaTemplate.send(topic, roomDto);
+    for(int i = 0; i < 10; i++) {
+      kafkaTemplate.send(topic, roomDto);
+    }
   }
 }
