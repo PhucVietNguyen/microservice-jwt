@@ -6,13 +6,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
 
   @Autowired private AuthEntryPointJwt unauthorizedHandler;
 
@@ -21,8 +21,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     return new AuthTokenFilter();
   }
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
+  @Bean
+  public ExceptionHandlerFilter exceptionHandlerFilter() {
+    return new ExceptionHandlerFilter();
+  }
+
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf()
         .disable()
         // make sure we use stateless session; session won't be used to store user's state.
@@ -48,5 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // Any other request must be authenticated
         .anyRequest()
         .authenticated();
+    http.addFilterBefore(exceptionHandlerFilter(), AuthTokenFilter.class);
+    return http.build();
   }
 }

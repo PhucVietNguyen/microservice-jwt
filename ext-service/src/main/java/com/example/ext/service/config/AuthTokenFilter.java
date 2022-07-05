@@ -1,6 +1,9 @@
 package com.example.ext.service.config;
 
+import com.example.common.core.exception.AccessTokenExpireException;
+import com.example.common.core.exception.InvalidAccessTokenException;
 import com.example.ext.service.util.JwtUtils;
+import com.example.ext.service.util.RedisUtils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,40 +26,37 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
   @Autowired private JwtUtils jwtUtils;
 
+  @Autowired private RedisUtils redisUtils;
+
   @Override
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    try {
-      String jwt = parseJwt(request);
-      if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-        String username = jwtUtils.getUserNameFromJwtToken(jwt);
-        if (username != null) {
-          @SuppressWarnings("unchecked")
-          List<String> authorities = jwtUtils.getAuthoritiesFromJwtToken(jwt);
 
-          // 5. Create auth object
-          // UsernamePasswordAuthenticationToken: A built-in object, used by spring to represent the
-          // current authenticated / being authenticated user. // It needs a list of authorities,
-          // which has type of GrantedAuthority interface, where SimpleGrantedAuthority is an
-          // implementation of that interface
-          UsernamePasswordAuthenticationToken authentication =
-              new UsernamePasswordAuthenticationToken(
-                  username,
-                  null,
-                  authorities.stream()
-                      .map(SimpleGrantedAuthority::new)
-                      .collect(Collectors.toList()));
+    String jwt = parseJwt(request);
+    Boolean isJwtValid = jwtUtils.validateJwtToken(jwt);
+    if (jwt == null || !isJwtValid) {
+      throw new InvalidAccessTokenException(jwt);
+    }
+    if (redisUtils.isTokenBlacklisted(jwt)) {
+      throw new AccessTokenExpireException(jwt);
+    }
 
-          // 6. Authenticate the user
-          // Now, user is authenticated  SecurityContextHolder.getContext().setAuthentication(auth);
-          authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-          SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-      }
-    } catch (Exception e) {
-      logger.error("Cannot set user authentication: {}", e);
-      SecurityContextHolder.clearContext();
+    String username = jwtUtils.getUserNameFromJwtToken(jwt);
+    if (username != null) {
+      @SuppressWarnings("unchecked")
+      List<String> authorities = jwtUtils.getAuthoritiesFromJwtToken(jwt);
+
+      // 5. Create auth object
+      UsernamePasswordAuthenticationToken authentication =
+          new UsernamePasswordAuthenticationToken(
+              username,
+              null,
+              authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+
+      // 6. Authenticate the user
+      authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+      SecurityContextHolder.getContext().setAuthentication(authentication);
     }
     filterChain.doFilter(request, response);
   }

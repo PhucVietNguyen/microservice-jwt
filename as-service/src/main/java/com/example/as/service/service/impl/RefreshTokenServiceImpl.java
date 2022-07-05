@@ -1,10 +1,10 @@
 package com.example.as.service.service.impl;
 
-import com.example.as.service.exception.TokenRefreshException;
 import com.example.as.service.model.entity.RefreshTokenEntity;
 import com.example.as.service.repository.RefreshTokenRepository;
 import com.example.as.service.repository.UserRepository;
 import com.example.as.service.service.RefreshTokenService;
+import com.example.common.core.exception.TokenRefreshException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,12 +30,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
   }
 
   @Override
-  public RefreshTokenEntity createRefreshToken(Long userId) {
+  public RefreshTokenEntity createRefreshToken(Long userId, String jwt) {
     RefreshTokenEntity refreshToken =
         RefreshTokenEntity.builder()
             .user(userRepository.findById(userId).get())
             .expiryDate(Instant.now().plusMillis(refreshTokenDurationMs))
             .token(UUID.randomUUID().toString())
+            .accessToken(jwt)
             .build();
     refreshToken = refreshTokenRepository.save(refreshToken);
     return refreshToken;
@@ -55,5 +56,15 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
   @Transactional
   public int deleteByUserId(Long userId) {
     return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
+  }
+
+  @Override
+  public RefreshTokenEntity updateRefreshToken(RefreshTokenEntity token) {
+    return refreshTokenRepository.save(token);
+  }
+
+  @Override
+  public int revokeRefreshTokenByUserId(String username) {
+    return refreshTokenRepository.deleteByUserName(username);
   }
 }

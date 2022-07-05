@@ -1,5 +1,6 @@
 package com.example.as.service.model.entity;
 
+import com.example.common.core.entities.AbstractAuditingEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -22,7 +23,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserEntity extends BaseEntity implements Serializable {
+public class UserEntity extends AbstractAuditingEntity<Long> implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +44,7 @@ public class UserEntity extends BaseEntity implements Serializable {
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
-      name = "user_roles",
+      name = "user_role",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<RoleEntity> roles = new HashSet<>();

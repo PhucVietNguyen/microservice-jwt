@@ -8,9 +8,13 @@ public interface RefreshTokenService {
 
   Optional<RefreshTokenEntity> findByToken(String token);
 
-  RefreshTokenEntity createRefreshToken(Long userId);
+  RefreshTokenEntity createRefreshToken(Long userId, String jwt);
 
   RefreshTokenEntity verifyExpiration(RefreshTokenEntity token);
 
   int deleteByUserId(Long userId);
+
+  RefreshTokenEntity updateRefreshToken(RefreshTokenEntity token);
+
+  int revokeRefreshTokenByUserId(String username);
 }

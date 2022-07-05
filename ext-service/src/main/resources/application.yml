@@ -2,7 +2,7 @@ spring:
   application:
     name: export-service
   datasource:
-    url: jdbc:mariadb://maria-db:3306/ext?createDatabaseIfNotExist=true
+    url: jdbc:mariadb://localhost:3306/ext
     tomcat:
       connection-properties: useUnicode=true;characterEncoding=utf-8;
     driver-class-name: org.mariadb.jdbc.Driver
@@ -10,11 +10,29 @@ spring:
     password: root
     jpa:
       hibernate:
-        ddl-auto: create
+        ddl-auto: update
       show-sql: true
       properties:
         hibernate:
           format_sql: true
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 3000ms
+  kafka:
+    bootstrap-servers: localhost:29092
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: '*'
+      group-id: ext
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 server:
   port: 8002
@@ -28,3 +46,21 @@ eureka:
 secret-key:
   app:
     jwtSecret: cong@chiend@u!2#
+
+dubbo:
+  application:
+    name: ext
+  registry:
+    address: zookeeper://localhost:2181?timeout=100000
+  scan:
+    base-packages: com.example.ext.service.dubbo
+  consumer:
+    check: false
+  protocol:
+    name: dubbo
+    port: -1
+
+cron-job:
+  size: 5
+  rate: 5000
+  topic: ext_test
