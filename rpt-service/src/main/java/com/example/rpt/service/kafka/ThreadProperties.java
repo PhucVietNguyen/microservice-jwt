@@ -6,5 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ThreadProperties {
-  private Integer numOfConsumer;
+  private Integer numOfConsumerDefault;
+
+  private Integer numOfConsumerMax;
 }

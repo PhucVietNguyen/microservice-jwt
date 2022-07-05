@@ -47,6 +47,7 @@ kafka-ext:
   topic-properties:
     name: ext_test
   thread-properties:
-    num-of-consumer: 2
+    num-of-consumer-default: 3
+    num-of-consumer-max: 6
   consumer-properties:
     group-id: ext

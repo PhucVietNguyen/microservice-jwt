@@ -4,21 +4,32 @@ import com.example.rpt.service.kafka.ext.ExtKafkaProperties;
 import com.example.rpt.service.kafka.ext.ProcessMessageKafkaFromExt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.Properties;
 
 @Service
 @Log4j2
 @RequiredArgsConstructor
 public class ThreadPoolKafkaService {
 
-  private final ThreadConsumerGroup threadConsumerGroup;
+  private final ExtKafkaProperties extKafkaProperties;
 
   @PostConstruct
   public void createThreadPool() {
-    threadConsumerGroup.execute();
+    ProcessMessageKafkaFromExt kafkaFromExt =
+        new ProcessMessageKafkaFromExt(
+            extKafkaProperties.getBootstrapServers(),
+            extKafkaProperties.getConsumerProperties().getGroupId(),
+            extKafkaProperties.getTopicProperties().getName());
+    kafkaFromExt.execute(
+        extKafkaProperties.getThreadProperties().getNumOfConsumerDefault(),
+        extKafkaProperties.getThreadProperties().getNumOfConsumerMax());
+    try {
+      Thread.sleep(100000);
+    } catch (InterruptedException ie) {
+
+    }
+    kafkaFromExt.shutdown();
   }
 }
