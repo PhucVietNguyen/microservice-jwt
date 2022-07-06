@@ -23,6 +23,7 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity
 
   @Transactional
   @Modifying(clearAutomatically = true)
-  @Query("DELETE FROM RefreshTokenEntity rt WHERE rt.user.username = :username")
+  @Query(
+      "DELETE FROM RefreshTokenEntity rt WHERE rt.user.id = (SELECT ue.id FROM UserEntity ue WHERE ue.username = :username)")
   int deleteByUserName(@Param("username") String username);
 }

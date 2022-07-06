@@ -68,6 +68,11 @@ public class JwtUtils {
     return getExpirationDateFromToken(token).getTime() - date.getTime();
   }
 
+  public Boolean isTokenExpired(String token) {
+    final Date expiration = getExpirationDateFromToken(token);
+    return expiration.before(new Date());
+  }
+
   public String parseJwt(HttpServletRequest request) {
     final String headerAuth = request.getHeader("Authorization");
 

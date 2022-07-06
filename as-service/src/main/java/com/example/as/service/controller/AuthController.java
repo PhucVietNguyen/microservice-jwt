@@ -1,5 +1,6 @@
 package com.example.as.service.controller;
 
+import com.example.as.service.model.dto.ResetPwDTO;
 import com.example.as.service.model.entity.RefreshTokenEntity;
 import com.example.as.service.model.entity.RoleEntity;
 import com.example.as.service.model.entity.UserEntity;
@@ -14,6 +15,7 @@ import com.example.as.service.model.response.JwtResponse;
 import com.example.as.service.model.response.MessageResponse;
 import com.example.as.service.repository.RoleRepository;
 import com.example.as.service.repository.UserRepository;
+import com.example.as.service.service.AuthenticationService;
 import com.example.as.service.service.RefreshTokenService;
 import com.example.as.service.service.UserAuthenticationHistoryService;
 import com.example.as.service.util.JwtUtils;
@@ -60,6 +62,9 @@ public class AuthController {
   @Autowired private RedisUtils redisUtils;
 
   @Autowired private UserAuthenticationHistoryService userAuthenticationHistoryService;
+
+  @Autowired
+  private AuthenticationService authenticationService;
 
   @PostMapping("/sign-in")
   public ResponseEntity<?> signIn(@Valid @RequestBody LoginRequest loginRequest) {
@@ -183,18 +188,26 @@ public class AuthController {
           CommonCoreErrorCode.INVALID_TOKEN.getDesc());
     }
     logoutRequest.setToken(token);
-    String username = jwtUtils.getUserNameFromJwtToken(token);
-
-    if (refreshTokenService.revokeRefreshTokenByUserId(username) == 0) {
-      throw BusinessException.builder()
-          .errorCode(CommonCoreErrorCode.TOKEN_EXPIRED.getServiceErrorCode())
-          .errorMsg(CommonCoreErrorCode.TOKEN_EXPIRED.getDesc())
-          .build();
-    }
-    userAuthenticationHistoryService.saveAuthenticationHistory(
-        logoutRequest, null, false, username);
-
-    redisUtils.blacklistJwt(token, username);
+    authenticationService.logout(logoutRequest);
     return ResponseEntity.ok("User successfully logout");
+  }
+
+//  @PostMapping("/send/reset-password-email")
+//  public void sendResetPasswordEmail(
+//          @Valid @RequestBody ForgetPasswordEmailVO forgetPasswordEmailVO,
+//          @RequestParam(value = "lang") String lang) {
+//    Locale locale = Locale.fromValue(lang);
+//    authenticationService.sendForgotPasswordEmail(forgetPasswordEmailVO.getEmail(), locale);
+//  }
+//
+//  @PostMapping("/check/reset-pw-code")
+//  public CheckResetPwCodeVO checkVerificationCode(
+//          @Valid @RequestBody CheckResetPwCodeVO resetPwVO) {
+//    return authenticationService.isResetPwCodeValid(resetPwVO);
+//  }
+
+  @PutMapping("/reset-password")
+  public ResetPwDTO resetPassword(@Valid @RequestBody ResetPwDTO resetPwVO) {
+    return authenticationService.resetPassword(resetPwVO);
   }
 }

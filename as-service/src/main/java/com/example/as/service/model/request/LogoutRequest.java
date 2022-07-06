@@ -15,4 +15,6 @@ public class LogoutRequest {
   private String ipAddress;
 
   private EUserAction userAction;
+
+  private String username;
 }
