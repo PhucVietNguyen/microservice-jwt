@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="eureka.server" />
+        <module name="gateway.service" />
         <module name="as.service" />
         <module name="ext.service.model" />
         <module name="common.core" />
@@ -31,6 +32,7 @@
       <module name="eureka.server" target="11" />
       <module name="ext.service" target="11" />
       <module name="ext.service.model" target="11" />
+      <module name="gateway.service" target="11" />
       <module name="rpt.service" target="11" />
     </bytecodeTargetLevel>
   </component>
@@ -41,6 +43,7 @@
       <module name="eureka.server" options="-parameters" />
       <module name="ext.service" options="-parameters" />
       <module name="ext.service.model" options="-parameters" />
+      <module name="gateway.service" options="-parameters" />
       <module name="rpt.service" options="-parameters" />
     </option>
   </component>

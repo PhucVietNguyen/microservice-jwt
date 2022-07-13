@@ -10,6 +10,8 @@
     <file url="file://$PROJECT_DIR$/ext-service-model/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ext-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ext-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpt-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpt-service/src/main/resources" charset="UTF-8" />
   </component>

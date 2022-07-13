@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/rpt-service/pom.xml" />
         <option value="$PROJECT_DIR$/ext-service-model/pom.xml" />
         <option value="$PROJECT_DIR$/common-core/pom.xml" />
+        <option value="$PROJECT_DIR$/gateway-service/pom.xml" />
       </list>
     </option>
   </component>
