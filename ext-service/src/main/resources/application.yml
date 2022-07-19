@@ -62,5 +62,9 @@ dubbo:
 
 cron-job:
   size: 5
-  rate: 5000
+  rate: 50000
   topic: ext_test
+
+rsa:
+  key:
+    public-key-file: /key/public_key

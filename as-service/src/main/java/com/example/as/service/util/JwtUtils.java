@@ -1,10 +1,12 @@
 package com.example.as.service.util;
 
+import com.example.as.service.config.RsaKeyProperties;
 import com.example.as.service.model.entity.RoleEntity;
 import com.example.as.service.model.entity.UserEntity;
 import com.example.as.service.model.entity.security.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +27,8 @@ public class JwtUtils {
   @Value("${secret-key.app.jwtExpirationMs}")
   private int jwtExpirationMs;
 
+  @Autowired private RsaKeyProperties rsaKeyProperties;
+
   private static final String AUTHORITIES_KEY = "authorities";
 
   public String generateJwtToken(Authentication authentication) {
@@ -38,7 +42,7 @@ public class JwtUtils {
                 .collect(Collectors.toList()))
         .setIssuedAt(new Date())
         .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-        .signWith(SignatureAlgorithm.HS512, jwtSecret)
+        .signWith(SignatureAlgorithm.RS256, rsaKeyProperties.getPrivateKey())
         .compact();
   }
 
@@ -50,16 +54,24 @@ public class JwtUtils {
             user.getRoles().stream().map(RoleEntity::getName).collect(Collectors.toList()))
         .setIssuedAt(new Date())
         .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-        .signWith(SignatureAlgorithm.HS512, jwtSecret)
+        .signWith(SignatureAlgorithm.RS256, rsaKeyProperties.getPrivateKey())
         .compact();
   }
 
   public String getUserNameFromJwtToken(String token) {
-    return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+    return Jwts.parser()
+        .setSigningKey(rsaKeyProperties.getPublicKey())
+        .parseClaimsJws(token)
+        .getBody()
+        .getSubject();
   }
 
   public Date getExpirationDateFromToken(String token) {
-    return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getExpiration();
+    return Jwts.parser()
+        .setSigningKey(rsaKeyProperties.getPublicKey())
+        .parseClaimsJws(token)
+        .getBody()
+        .getExpiration();
   }
 
   //  return token remaining time in ms
@@ -79,7 +91,7 @@ public class JwtUtils {
 
   public boolean validateJwtToken(String authToken) {
     try {
-      Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+      Jwts.parser().setSigningKey(rsaKeyProperties.getPublicKey()).parseClaimsJws(authToken);
       return true;
     } catch (SignatureException e) {
       log.error("Invalid JWT signature: {}", e.getMessage());

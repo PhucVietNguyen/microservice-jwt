@@ -37,3 +37,8 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+
+rsa:
+  key:
+    public-key-file: /key/public_key
+    private-key-file: /key/private_key

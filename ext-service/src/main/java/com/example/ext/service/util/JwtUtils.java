@@ -1,7 +1,9 @@
 package com.example.ext.service.util;
 
+import com.example.ext.service.config.RsaKeyProperties;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,18 +16,30 @@ public class JwtUtils {
   @Value("${secret-key.app.jwtSecret}")
   private String jwtSecret;
 
+  @Autowired private RsaKeyProperties rsaKeyProperties;
+
+  private static final String AUTHORITIES_KEY = "authorities";
+
   public String getUserNameFromJwtToken(String token) {
-    return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+    return Jwts.parser()
+        .setSigningKey(rsaKeyProperties.getPublicKey())
+        .parseClaimsJws(token)
+        .getBody()
+        .getSubject();
   }
 
   public List<String> getAuthoritiesFromJwtToken(String token) {
     return (List<String>)
-        Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().get("authorities");
+        Jwts.parser()
+            .setSigningKey(rsaKeyProperties.getPublicKey())
+            .parseClaimsJws(token)
+            .getBody()
+            .get(AUTHORITIES_KEY);
   }
 
   public boolean validateJwtToken(String authToken) {
     try {
-      Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+      Jwts.parser().setSigningKey(rsaKeyProperties.getPublicKey()).parseClaimsJws(authToken);
       return true;
     } catch (SignatureException e) {
       log.error("Invalid JWT signature: {}", e.getMessage());
