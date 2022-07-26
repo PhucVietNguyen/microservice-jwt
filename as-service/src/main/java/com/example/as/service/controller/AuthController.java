@@ -14,10 +14,10 @@ import com.example.as.service.model.response.JwtResponse;
 import com.example.as.service.model.response.MessageResponse;
 import com.example.as.service.repository.RoleRepository;
 import com.example.as.service.repository.UserRepository;
+import com.example.as.service.service.AuthenticationService;
 import com.example.as.service.service.RefreshTokenService;
 import com.example.as.service.service.UserAuthenticationHistoryService;
 import com.example.as.service.util.JwtUtils;
-import com.example.as.service.util.RedisUtils;
 import com.example.common.core.enums.exception.CommonCoreErrorCode;
 import com.example.common.core.exception.BusinessException;
 import com.example.common.core.exception.TokenRefreshException;
@@ -57,7 +57,7 @@ public class AuthController {
 
   @Autowired private RefreshTokenService refreshTokenService;
 
-  @Autowired private RedisUtils redisUtils;
+  @Autowired private AuthenticationService authenticationService;
 
   @Autowired private UserAuthenticationHistoryService userAuthenticationHistoryService;
 
@@ -165,11 +165,12 @@ public class AuthController {
       throw new TokenRefreshException(requestRefreshToken, "Refresh token is not exist");
     }
     RefreshTokenEntity refreshToken = refreshTokenOpt.get();
-    redisUtils.blacklistJwt(refreshToken);
+    UserDetailsImpl userDetails =
+        (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    final String accessToken = userDetails.getJwt();
+    authenticationService.blacklistJwt(accessToken);
     refreshTokenService.verifyExpiration(refreshToken);
     String token = jwtUtils.generateTokenFromUsername(refreshToken.getUser());
-    refreshToken.setAccessToken(token);
-    refreshTokenService.updateRefreshToken(refreshToken);
     return ResponseEntity.ok(new JwtRefreshResponse(token, requestRefreshToken, "Bearer"));
   }
 
@@ -194,7 +195,7 @@ public class AuthController {
     userAuthenticationHistoryService.saveAuthenticationHistory(
         logoutRequest, null, false, username);
 
-    redisUtils.blacklistJwt(token, username);
+    authenticationService.blacklistJwt(token);
     return ResponseEntity.ok("User successfully logout");
   }
 }

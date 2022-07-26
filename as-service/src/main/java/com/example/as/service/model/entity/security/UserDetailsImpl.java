@@ -23,6 +23,8 @@ public class UserDetailsImpl implements UserDetails {
 
   @JsonIgnore private String password;
 
+  private String jwt;
+
   private Collection<? extends GrantedAuthority> authorities;
 
   public UserDetailsImpl(
@@ -88,6 +90,14 @@ public class UserDetailsImpl implements UserDetails {
   @Override
   public boolean isEnabled() {
     return true;
+  }
+
+  public String getJwt() {
+    return jwt;
+  }
+
+  public void setJwt(String jwt) {
+    this.jwt = jwt;
   }
 
   @Override

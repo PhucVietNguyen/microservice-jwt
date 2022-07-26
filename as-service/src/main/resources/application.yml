@@ -33,12 +33,25 @@ secret-key:
     jwtExpirationMs: 240000
     jwtRefreshExpirationMs: 1200000
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka/
 
 rsa:
   key:
     public-key-file: /key/public_key
     private-key-file: /key/private_key
+
+dubbo:
+  application:
+    name: ext
+  registry:
+    address: zookeeper://localhost:2181?timeout=100000
+  scan:
+    base-packages: com.example.ext.service.dubbo
+  consumer:
+    check: false
+  protocol:
+    name: dubbo
+    port: -1

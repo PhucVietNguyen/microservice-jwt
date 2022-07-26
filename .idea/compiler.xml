@@ -27,20 +27,24 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="as.service" target="11" />
+      <module name="as.service.model" target="11" />
       <module name="common.core" target="11" />
       <module name="eureka.server" target="11" />
       <module name="ext.service" target="11" />
       <module name="ext.service.model" target="11" />
+      <module name="ext.service.model (1)" target="11" />
       <module name="rpt.service" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="as.service" options="-parameters" />
+      <module name="as.service.model" options="-parameters" />
       <module name="common.core" options="-parameters" />
       <module name="eureka.server" options="-parameters" />
       <module name="ext.service" options="-parameters" />
       <module name="ext.service.model" options="-parameters" />
+      <module name="ext.service.model (1)" options="-parameters" />
       <module name="rpt.service" options="-parameters" />
     </option>
   </component>

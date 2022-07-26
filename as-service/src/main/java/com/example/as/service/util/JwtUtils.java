@@ -66,6 +66,15 @@ public class JwtUtils {
         .getSubject();
   }
 
+  public String getUserNameFromHttpRequest(HttpServletRequest request) {
+    final String token = parseJwt(request);
+    return Jwts.parser()
+            .setSigningKey(rsaKeyProperties.getPublicKey())
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject();
+  }
+
   public Date getExpirationDateFromToken(String token) {
     return Jwts.parser()
         .setSigningKey(rsaKeyProperties.getPublicKey())
@@ -82,6 +91,14 @@ public class JwtUtils {
 
   public String parseJwt(HttpServletRequest request) {
     final String headerAuth = request.getHeader("Authorization");
+
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+      return headerAuth.substring(7);
+    }
+    return null;
+  }
+
+  public String parseJwt(String headerAuth) {
 
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
       return headerAuth.substring(7);
