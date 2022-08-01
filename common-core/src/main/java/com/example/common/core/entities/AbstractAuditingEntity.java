@@ -40,9 +40,9 @@ public abstract class AbstractAuditingEntity<T> implements EntityInterface<T> {
   @LastModifiedDate
   protected Instant modifiedDate;
 
-  @Field("is_deleted")
-  @Column(name = "is_deleted")
-  @ColumnDefault("false")
-  @NotNull
-  protected boolean deleted;
+//  @Field("is_deleted")
+//  @Column(name = "is_deleted")
+//  @ColumnDefault("false")
+//  @NotNull
+//  protected boolean deleted;
 }

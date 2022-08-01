@@ -5,6 +5,7 @@ import com.example.as.service.model.entity.RoleEntity;
 import com.example.as.service.model.entity.UserEntity;
 import com.example.as.service.model.entity.security.UserDetailsImpl;
 import com.example.as.service.model.enums.ERole;
+import com.example.as.service.model.enums.ESocialProvider;
 import com.example.as.service.model.request.LoginRequest;
 import com.example.as.service.model.request.LogoutRequest;
 import com.example.as.service.model.request.SignupRequest;
@@ -115,6 +116,7 @@ public class AuthController {
             .username(signUpRequest.getUsername())
             .email(signUpRequest.getEmail())
             .password(encoder.encode(signUpRequest.getPassword()))
+            .provider(ESocialProvider.local)
             .build();
     Set<String> strRoles = signUpRequest.getRoles();
     Set<RoleEntity> roles = new HashSet<>();

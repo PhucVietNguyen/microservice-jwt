@@ -1,11 +1,11 @@
 package com.example.as.service.model.entity;
 
+import com.example.as.service.model.enums.ESocialProvider;
 import com.example.common.core.entities.AbstractAuditingEntity;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -29,20 +29,24 @@ public class UserEntity extends AbstractAuditingEntity<Long> implements Serializ
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotBlank
   @Size(max = 20)
   private String username;
 
-  @NotBlank
   @Size(max = 50)
   @Email
   private String email;
 
-  @NotBlank
   @Size(max = 120)
   private String password;
 
-  @ManyToMany(fetch = FetchType.LAZY)
+  private String imageUrl;
+
+  @Enumerated(EnumType.STRING)
+  private ESocialProvider provider;
+
+  private String providerId;
+
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "user_role",
       joinColumns = @JoinColumn(name = "user_id"),

@@ -23,4 +23,13 @@ public class UserServiceImpl implements UserService {
                 () -> new UsernameNotFoundException("User not found with username: " + username));
     return UserDetailsImpl.build(user);
   }
+
+  @Override
+  public UserDetails loadUserById(Long id) {
+    UserEntity user =
+        userRepository
+            .findById(id)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+    return UserDetailsImpl.build(user);
+  }
 }

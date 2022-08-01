@@ -12,7 +12,7 @@
         <module name="ext.service.model" />
         <module name="common.core" />
       </profile>
-      <profile name="Annotation profile for rpt.service" enabled="true">
+      <profile name="Annotation profile for ext.service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
