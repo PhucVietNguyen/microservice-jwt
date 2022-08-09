@@ -1,12 +1,11 @@
-package com.example.ext.service.config;
+package com.example.rpt.service.config;
 
 import com.example.common.core.enums.exception.CommonCoreErrorCode;
 import com.example.common.core.exception.AccessTokenExpireException;
+import com.example.common.core.exception.ErrorResponse;
 import com.example.common.core.exception.InvalidAccessTokenException;
-import com.example.ext.service.model.response.ErrorResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Log4j2
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
   @Override
@@ -40,10 +38,10 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
     } catch (AccessDeniedException e) {
       e.printStackTrace();
       ErrorResponse errorResponse =
-              ErrorResponse.builder()
-                      .errorCode(CommonCoreErrorCode.INVALID_TOKEN.getServiceErrorCode())
-                      .errorMessage(CommonCoreErrorCode.INVALID_TOKEN.getDesc())
-                      .build();
+          ErrorResponse.builder()
+              .errorCode(CommonCoreErrorCode.INVALID_TOKEN.getServiceErrorCode())
+              .errorMessage(CommonCoreErrorCode.INVALID_TOKEN.getDesc())
+              .build();
       httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
       httpServletResponse.getWriter().write(convertObjectToJson(errorResponse));
     } catch (Exception e) {

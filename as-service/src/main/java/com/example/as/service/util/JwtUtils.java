@@ -1,6 +1,5 @@
 package com.example.as.service.util;
 
-import com.example.as.service.config.AppProperties;
 import com.example.as.service.config.RsaKeyProperties;
 import com.example.as.service.model.entity.RoleEntity;
 import com.example.as.service.model.entity.UserEntity;
@@ -22,22 +21,18 @@ import java.util.stream.Collectors;
 @Log4j2
 public class JwtUtils {
 
-  @Value("${secret-key.app.jwtSecret}")
-  private String jwtSecret;
-
   @Value("${secret-key.app.jwtExpirationMs}")
   private int jwtExpirationMs;
 
   @Autowired private RsaKeyProperties rsaKeyProperties;
-
-  @Autowired private AppProperties appProperties;
 
   private static final String AUTHORITIES_KEY = "authorities";
 
   public String generateJwtToken(Authentication authentication) {
     UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
     return Jwts.builder()
-        .setSubject((userPrincipal.getUsername()))
+        .setId(String.valueOf(userPrincipal.getId()))
+        .setSubject(userPrincipal.getUsername())
         .claim(
             AUTHORITIES_KEY,
             userPrincipal.getAuthorities().stream()
@@ -46,22 +41,6 @@ public class JwtUtils {
         .setIssuedAt(new Date())
         .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
         .signWith(SignatureAlgorithm.RS256, rsaKeyProperties.getPrivateKey())
-        .compact();
-  }
-
-  public String generateJwtTokenSocial(Authentication authentication) {
-    UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-    return Jwts.builder()
-        .setSubject(String.valueOf((userPrincipal.getId())))
-        .claim(
-            AUTHORITIES_KEY,
-            userPrincipal.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()))
-        .setIssuedAt(new Date())
-        .setExpiration(
-            new Date(new Date().getTime() + appProperties.getAuth().getTokenExpirationMsec()))
-        .signWith(SignatureAlgorithm.HS512, appProperties.getAuth().getTokenSecret())
         .compact();
   }
 
@@ -85,26 +64,12 @@ public class JwtUtils {
         .getSubject();
   }
 
-  public String getUserIdFromJwtTokenSocial(String token) {
-    return Jwts.parser()
-        .setSigningKey(appProperties.getAuth().getTokenSecret())
-        .parseClaimsJws(token)
-        .getBody()
-        .getSubject();
-  }
-
-  public Date getExpirationDateFromToken(String token) {
+  public String getUserIdFromJwtToken(String token) {
     return Jwts.parser()
         .setSigningKey(rsaKeyProperties.getPublicKey())
         .parseClaimsJws(token)
         .getBody()
-        .getExpiration();
-  }
-
-  //  return token remaining time in ms
-  public Long getTokenRemainingTime(String token) {
-    Date date = new Date();
-    return getExpirationDateFromToken(token).getTime() - date.getTime();
+        .getId();
   }
 
   public String parseJwt(HttpServletRequest request) {
@@ -119,26 +84,6 @@ public class JwtUtils {
   public boolean validateJwtToken(String authToken) {
     try {
       Jwts.parser().setSigningKey(rsaKeyProperties.getPublicKey()).parseClaimsJws(authToken);
-      return true;
-    } catch (SignatureException e) {
-      log.error("Invalid JWT signature: {}", e.getMessage());
-    } catch (MalformedJwtException e) {
-      log.error("Invalid JWT token: {}", e.getMessage());
-    } catch (ExpiredJwtException e) {
-      log.error("JWT token is expired: {}", e.getMessage());
-    } catch (UnsupportedJwtException e) {
-      log.error("JWT token is unsupported: {}", e.getMessage());
-    } catch (IllegalArgumentException e) {
-      log.error("JWT claims string is empty: {}", e.getMessage());
-    }
-    return false;
-  }
-
-  public boolean validateJwtTokenSocial(String authToken) {
-    try {
-      Jwts.parser()
-          .setSigningKey(appProperties.getAuth().getTokenSecret())
-          .parseClaimsJws(authToken);
       return true;
     } catch (SignatureException e) {
       log.error("Invalid JWT signature: {}", e.getMessage());

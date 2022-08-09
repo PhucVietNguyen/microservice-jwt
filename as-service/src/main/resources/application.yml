@@ -59,9 +59,8 @@ logging:
 
 secret-key:
   app:
-    jwtSecret: cong@chiend@u!2#
-    jwtExpirationMs: 240000
-    jwtRefreshExpirationMs: 1200000
+    jwtExpirationMs: 3600000
+    jwtRefreshExpirationMs: 7200000
 
 eureka:
   client:
@@ -74,9 +73,6 @@ rsa:
     private-key-file: /key/private_key
 
 app:
-  auth:
-    tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
-    tokenExpirationMsec: 864000000
   oauth2:
     # After successfully authenticating with the OAuth2 Provider,
     # we'll be generating an auth token for the user and sending the token to the
