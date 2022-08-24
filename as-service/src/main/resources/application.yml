@@ -57,20 +57,32 @@ logging:
   level:
     root: info
 
-secret-key:
-  app:
-    jwtExpirationMs: 3600000
-    jwtRefreshExpirationMs: 7200000
+jwt:
+  expirationMs: 3600000
+  refreshExpirationMs: 7200000
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka/
 
 rsa:
   key:
     public-key-file: /key/public_key
     private-key-file: /key/private_key
+
+dubbo:
+  application:
+    name: as
+  registry:
+    address: zookeeper://localhost:2181?timeout=100000
+  scan:
+    base-packages: com.example.as.service.dubbo
+  consumer:
+    check: false
+  protocol:
+    name: dubbo
+    port: -1
 
 app:
   oauth2:

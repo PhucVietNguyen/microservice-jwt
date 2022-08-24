@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 @Log4j2
 public class JwtUtils {
 
-  @Value("${secret-key.app.jwtExpirationMs}")
-  private int jwtExpirationMs;
+  @Value("${jwt.expirationMs}")
+  private Long expirationMs;
 
   @Autowired private RsaKeyProperties rsaKeyProperties;
 
@@ -39,7 +39,7 @@ public class JwtUtils {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()))
         .setIssuedAt(new Date())
-        .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+        .setExpiration(new Date((new Date()).getTime() + expirationMs))
         .signWith(SignatureAlgorithm.RS256, rsaKeyProperties.getPrivateKey())
         .compact();
   }
@@ -51,7 +51,7 @@ public class JwtUtils {
             AUTHORITIES_KEY,
             user.getRoles().stream().map(RoleEntity::getName).collect(Collectors.toList()))
         .setIssuedAt(new Date())
-        .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+        .setExpiration(new Date((new Date()).getTime() + expirationMs))
         .signWith(SignatureAlgorithm.RS256, rsaKeyProperties.getPrivateKey())
         .compact();
   }
@@ -77,6 +77,14 @@ public class JwtUtils {
 
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
       return headerAuth.substring(7);
+    }
+    return null;
+  }
+
+  public String parseJwt(String token) {
+
+    if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+      return token.substring(7);
     }
     return null;
   }

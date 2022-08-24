@@ -11,6 +11,7 @@
         <module name="as.service" />
         <module name="ext.service.model" />
         <module name="common.core" />
+        <module name="as.service.model" />
       </profile>
       <profile name="Annotation profile for ext.service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -27,6 +28,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="as.service" target="11" />
+      <module name="as.service.model" target="11" />
       <module name="common.core" target="11" />
       <module name="eureka.server" target="11" />
       <module name="ext.service" target="11" />
@@ -37,6 +39,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="as.service" options="-parameters" />
+      <module name="as.service.model" options="-parameters" />
       <module name="common.core" options="-parameters" />
       <module name="eureka.server" options="-parameters" />
       <module name="ext.service" options="-parameters" />

@@ -15,10 +15,10 @@ spring:
       properties:
         hibernate:
           format_sql: true
-  redis:
-    host: localhost
-    port: 6379
-    timeout: 3000ms
+#  redis:
+#    host: localhost
+#    port: 6379
+#    timeout: 3000ms
   kafka:
     bootstrap-servers: localhost:29092
     consumer:
@@ -38,14 +38,14 @@ server:
   port: 8002
 
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka/
 
-secret-key:
-  app:
-    jwtSecret: cong@chiend@u!2#
+#secret-key:
+#  app:
+#    jwtSecret: cong@chiend@u!2#
 
 dubbo:
   application:
@@ -65,6 +65,6 @@ cron-job:
   rate: 50000
   topic: ext_test
 
-rsa:
-  key:
-    public-key-file: /key/public_key
+#rsa:
+#  key:
+#    public-key-file: /key/public_key
